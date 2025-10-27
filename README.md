@@ -246,18 +246,25 @@ See `.env.example` for all available authentication configuration options:
 **For production use, we recommend:**
 - ✅ **Authentication/Authorization** - Now available with multiple methods!
 - **HTTPS/TLS** - Encrypt traffic between client and server
+- **Rate Limiting** - Add rate limiting to prevent brute force attacks on login endpoints
+- **CORS Configuration** - Restrict CORS to specific domains (set `CORS_ORIGIN` in `.env`)
 - **Input Validation** - Additional validation for URLs, headers, and body content
-- **Rate Limiting** - Prevent abuse and excessive API calls
 - **Database Persistence** - Replace in-memory storage with a database
 - **URL Filtering** - Allowlist/blocklist for target URLs
 - **Network Isolation** - Run in a restricted network environment
 - **Audit Logging** - Track all task executions and modifications
 
+**Known Security Considerations:**
+- JWT tokens are used for authentication (not session cookies), reducing CSRF risk
+- Rate limiting is not implemented - consider adding a reverse proxy with rate limiting (e.g., nginx)
+- CORS is permissive by default - restrict in production via `CORS_ORIGIN` environment variable
+
 **Recommended Deployment:**
 - Use in private/internal networks only
 - Enable authentication for production environments
 - Use strong JWT secrets (change default in `.env`)
-- Implement network-level security controls
+- Configure CORS to allow only your frontend domain
+- Add rate limiting via reverse proxy (nginx, Cloudflare, etc.)
 - Regular security audits
 - Keep dependencies updated
 
