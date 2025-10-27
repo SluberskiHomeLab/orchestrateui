@@ -199,6 +199,12 @@ Authentication is **disabled by default** for backwards compatibility. To enable
 
 2. Set `AUTH_ENABLED=true` in your `.env` file
 
+3. **IMPORTANT**: Set a strong, random `JWT_SECRET` in your `.env` file:
+   ```bash
+   JWT_SECRET=$(openssl rand -hex 32)
+   ```
+   Never use the default secret in production!
+
 3. Configure your preferred authentication methods
 
 4. Start the application:

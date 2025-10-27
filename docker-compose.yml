@@ -12,7 +12,8 @@ services:
       - PORT=3001
       # Authentication settings
       - AUTH_ENABLED=${AUTH_ENABLED:-false}
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      # IMPORTANT: Set a strong JWT_SECRET in .env file when AUTH_ENABLED=true
+      - JWT_SECRET=${JWT_SECRET:-change-this-in-production-INSECURE}
       - JWT_EXPIRY=${JWT_EXPIRY:-24h}
       - CORS_ORIGIN=${CORS_ORIGIN:-*}
       # OIDC/OAuth2 settings
