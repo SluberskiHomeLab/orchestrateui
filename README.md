@@ -166,13 +166,31 @@ orchestrateui/
 
 ## 🔒 Security Notes
 
-- This is a development/home lab tool
-- For production use, consider adding:
-  - Authentication/Authorization
-  - HTTPS/TLS support
-  - Input validation and sanitization
-  - Rate limiting
-  - Database persistence (currently uses in-memory storage)
+**Important Security Considerations:**
+
+- This is designed as a **development/home lab tool** for trusted environments
+- The application makes HTTP requests to user-provided URLs - this is intentional core functionality
+- **Request Forgery Risk**: Users can configure tasks to call any URL. In production environments, consider:
+  - Adding URL allowlisting/denylisting
+  - Network-level restrictions (firewall rules, network policies)
+  - Running in an isolated network segment
+  - Adding authentication/authorization
+  
+**For production use, consider adding:**
+- **Authentication/Authorization** - Add user management and access control
+- **HTTPS/TLS** - Encrypt traffic between client and server
+- **Input Validation** - Additional validation for URLs, headers, and body content
+- **Rate Limiting** - Prevent abuse and excessive API calls
+- **Database Persistence** - Replace in-memory storage with a database
+- **URL Filtering** - Allowlist/blocklist for target URLs
+- **Network Isolation** - Run in a restricted network environment
+- **Audit Logging** - Track all task executions and modifications
+
+**Recommended Deployment:**
+- Use in private/internal networks only
+- Implement network-level security controls
+- Regular security audits
+- Keep dependencies updated
 
 ## 📝 Environment Variables
 
