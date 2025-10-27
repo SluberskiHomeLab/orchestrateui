@@ -10,6 +10,26 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
+      # Authentication settings
+      - AUTH_ENABLED=${AUTH_ENABLED:-false}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - JWT_EXPIRY=${JWT_EXPIRY:-24h}
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+      # OIDC/OAuth2 settings
+      - OIDC_ENABLED=${OIDC_ENABLED:-false}
+      - OIDC_AUTHORIZATION_URL=${OIDC_AUTHORIZATION_URL}
+      - OIDC_TOKEN_URL=${OIDC_TOKEN_URL}
+      - OIDC_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OIDC_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OIDC_CALLBACK_URL=${OIDC_CALLBACK_URL:-http://localhost:3001/api/auth/oidc/callback}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      # LDAP settings
+      - LDAP_ENABLED=${LDAP_ENABLED:-false}
+      - LDAP_URL=${LDAP_URL}
+      - LDAP_BIND_DN=${LDAP_BIND_DN}
+      - LDAP_BIND_PASSWORD=${LDAP_BIND_PASSWORD}
+      - LDAP_SEARCH_BASE=${LDAP_SEARCH_BASE}
+      - LDAP_SEARCH_FILTER=${LDAP_SEARCH_FILTER:-(uid={{username}})}
     restart: unless-stopped
     networks:
       - orchestrateui-network
