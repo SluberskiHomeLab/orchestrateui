@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { AuthProvider, useAuth } from './AuthContext';
+import Login from './Login';
+import Admin from './Admin';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
-function App() {
+function MainApp() {
+  const { user, loading, authEnabled, logout, isAdmin } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -29,7 +33,7 @@ function App() {
       loadHistory();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const loadTasks = async () => {
     try {
@@ -126,11 +130,38 @@ function App() {
     setShowForm(false);
   };
 
+  // Show login page if auth is enabled and user is not authenticated
+  if (authEnabled && !user && !loading) {
+    return <Login />;
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="App">
+        <div className="loading">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <header className="header">
-        <h1>🎯 OrchestrateUI</h1>
-        <p>API Automation & Scheduling Tool</p>
+        <div className="header-content">
+          <div>
+            <h1>🎯 OrchestrateUI</h1>
+            <p>API Automation & Scheduling Tool</p>
+          </div>
+          {authEnabled && user && (
+            <div className="user-info">
+              <span className="username">👤 {user.username}</span>
+              {isAdmin && <span className="admin-badge">Admin</span>}
+              <button className="btn btn-secondary btn-small" onClick={logout}>
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="container">
@@ -147,6 +178,14 @@ function App() {
           >
             Execution History
           </button>
+          {isAdmin && (
+            <button
+              className={activeTab === 'admin' ? 'tab active' : 'tab'}
+              onClick={() => setActiveTab('admin')}
+            >
+              Admin
+            </button>
+          )}
         </div>
 
         {activeTab === 'tasks' && (
@@ -387,8 +426,20 @@ function App() {
             </div>
           </div>
         )}
+
+        {activeTab === 'admin' && isAdmin && (
+          <Admin />
+        )}
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }
 

@@ -164,6 +164,73 @@ orchestrateui/
 - **Docker Compose** - Multi-container orchestration
 - **Nginx** - Web server and reverse proxy
 
+## 🔐 Authentication & Authorization
+
+OrchestrateUI now supports optional authentication with multiple authentication methods:
+
+### Authentication Methods
+
+1. **Username/Password (Local Authentication)**
+   - Traditional username and password authentication
+   - Passwords are securely hashed using bcrypt
+   - First registered user becomes an administrator
+
+2. **OIDC/OAuth2 (Auth0, Okta, etc.)**
+   - Single Sign-On (SSO) with your organization's identity provider
+   - Supports Auth0, Okta, Azure AD, and other OIDC-compliant providers
+
+3. **LDAP Authentication**
+   - Integration with Active Directory or LDAP servers
+   - Users can authenticate with their corporate credentials
+
+4. **API Keys**
+   - Generate API keys for programmatic access
+   - Perfect for CI/CD pipelines and automation
+   - Keys can have optional expiration dates
+
+### Enabling Authentication
+
+Authentication is **disabled by default** for backwards compatibility. To enable it:
+
+1. Copy `.env.example` to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Set `AUTH_ENABLED=true` in your `.env` file
+
+3. **IMPORTANT**: Set a strong, random `JWT_SECRET` in your `.env` file:
+   ```bash
+   JWT_SECRET=$(openssl rand -hex 32)
+   ```
+   Never use the default secret in production!
+
+3. Configure your preferred authentication methods
+
+4. Start the application:
+   ```bash
+   docker-compose up -d
+   ```
+
+5. Register the first user (will automatically become an admin)
+
+### Admin Features
+
+Administrators have access to an Admin panel with the following capabilities:
+
+- **User Management**: Create, edit, and delete user accounts
+- **Role Assignment**: Assign admin or user roles
+- **API Key Management**: Generate and manage API keys for users
+- **Access Control**: Tasks are automatically scoped to their creators
+
+### Configuration
+
+See `.env.example` for all available authentication configuration options:
+
+- **JWT Settings**: Secret key and token expiration
+- **OIDC/OAuth2**: Provider URLs and credentials
+- **LDAP**: Server connection and search parameters
+
 ## 🔒 Security Notes
 
 **Important Security Considerations:**
@@ -174,28 +241,46 @@ orchestrateui/
   - Adding URL allowlisting/denylisting
   - Network-level restrictions (firewall rules, network policies)
   - Running in an isolated network segment
-  - Adding authentication/authorization
+  - Enabling authentication/authorization (now available!)
   
-**For production use, consider adding:**
-- **Authentication/Authorization** - Add user management and access control
+**For production use, we recommend:**
+- ✅ **Authentication/Authorization** - Now available with multiple methods!
 - **HTTPS/TLS** - Encrypt traffic between client and server
+- **Rate Limiting** - Add rate limiting to prevent brute force attacks on login endpoints
+- **CORS Configuration** - Restrict CORS to specific domains (set `CORS_ORIGIN` in `.env`)
 - **Input Validation** - Additional validation for URLs, headers, and body content
-- **Rate Limiting** - Prevent abuse and excessive API calls
 - **Database Persistence** - Replace in-memory storage with a database
 - **URL Filtering** - Allowlist/blocklist for target URLs
 - **Network Isolation** - Run in a restricted network environment
 - **Audit Logging** - Track all task executions and modifications
 
+**Known Security Considerations:**
+- JWT tokens are used for authentication (not session cookies), reducing CSRF risk
+- Rate limiting is not implemented - consider adding a reverse proxy with rate limiting (e.g., nginx)
+- CORS is permissive by default - restrict in production via `CORS_ORIGIN` environment variable
+
 **Recommended Deployment:**
 - Use in private/internal networks only
-- Implement network-level security controls
+- Enable authentication for production environments
+- Use strong JWT secrets (change default in `.env`)
+- Configure CORS to allow only your frontend domain
+- Add rate limiting via reverse proxy (nginx, Cloudflare, etc.)
 - Regular security audits
 - Keep dependencies updated
 
 ## 📝 Environment Variables
 
-### Backend
+### Docker Compose (using .env file)
+See `.env.example` for all available configuration options including:
+- `AUTH_ENABLED` - Enable/disable authentication (default: false)
+- `JWT_SECRET` - Secret key for JWT tokens
+- `JWT_EXPIRY` - Token expiration time (default: 24h)
+- `OIDC_*` - OIDC/OAuth2 provider settings
+- `LDAP_*` - LDAP server configuration
+
+### Backend (direct node execution)
 - `PORT` - Server port (default: 3001)
+- See `backend/.env.example` for authentication settings
 
 ### Frontend (build time)
 - `REACT_APP_API_URL` - Backend API URL (default: http://localhost:3001/api)
